@@ -3,7 +3,7 @@ module(..., package.seeall)
 local fadeInDur = 100
 local fadeOutDur = 100
 local channel = 32
-local _wait = 0 --(delay)
+local _delay = 0 --(delay)
 local _volume = 1
 
 
@@ -127,7 +127,7 @@ print("step 3 - plays the audio")
                 --      transIn[i]=transition.dissolve(text[i].activeText,text[i],trans2,delay2)
                     end
           end
-          timerStash.syncTimer = timer.performWithDelay(_wait, syncClosure) 
+          timerStash.syncTimer = timer.performWithDelay(_delay, syncClosure) 
         end
         
 
@@ -135,7 +135,7 @@ print("step 3 - plays the audio")
 end
 
 -- The button was pressed, so start talking. Highlight each word as it's spoken.
-local function touchSentence(event)
+local function onTapSentence(event)
 print("step 4 - play on request")
     local button = event.target
     local text = button.text
@@ -148,7 +148,7 @@ print("step 4 - play on request")
     if isChannelPlaying then
         --nothing
     else
-    print("touchSentence channel",channel)
+    print("onTapSentence channel",channel)
     audio.rewind(sentence)
         audio.setVolume(_volume, {channel=channel})
         audio.play(sentence, {channel=channel})
@@ -219,7 +219,7 @@ end
 
 function addSentence(params)
 print("step 1 - prepares to display the text")
-    local textGroup = display.newGroup()
+    local txtDisplayGroup = display.newGroup()
     local transTime = 1000
     if params.fadeDuration then
         transTime = params.fadeDuration
@@ -236,7 +236,7 @@ print("step 1 - prepares to display the text")
         channel = params.channel
     end
     if params.delay then
-        _wait = params.delay * 1000
+        _delay = params.delay * 1000
     end
     if params.volume then
         _volume = params.volume / 10
@@ -276,13 +276,13 @@ print("step 1 - prepares to display the text")
         padding = params.padding
     end
 
-    local leftPadding = 0
+    local talkButtonPadding = 0
     if buttonInclude then
-        leftPadding = talkButton.width
+        talkButtonPadding = talkButton.width
     end
-    local fontOffset = 0
-    if params.fontOffset then
-        fontOffset = params.fontOffset
+    local lineOffset = 0
+    if params.lineOffset then
+        lineOffset = params.lineOffset
     end
     local backgroundRectAlpha = 0
     if params.backgroundRectAlpha then
@@ -302,29 +302,29 @@ print("step 1 - prepares to display the text")
 
 --[[    if not escapeButton.isHitTestable then transTime = 0 end        -- bring up sentence immeditately since we've escaped out of the intro
 --]]
-    talkButton:addEventListener( "tap", touchSentence )
+    talkButton:addEventListener( "tap", onTapSentence )
     talkButton.sentence = params.sentence               -- name of audio file to use
     talkButton.line = params.line                               -- array holding timings and words
 
     -- display the text
     talkButton.text = displayText{line=params.line,sentence=params.sentence,sentenceDir=params.sentenceDir,
-                                                                x=params.x+padding+leftPadding,y=params.y+padding+fontOffset, font=font, fontColor=fontColor, fontSize=fontSize, addListner=true, fontColorHi=fontColorHi,
-                                                                group=textGroup, wordTouch=params.wordTouch, readDir=readDir}
+                                                                x=params.x+padding+talkButtonPadding,y=params.y+padding+lineOffset, font=font, fontColor=fontColor, fontSize=fontSize, addListner=true, fontColorHi=fontColorHi,
+                                                                group=txtDisplayGroup, wordTouch=params.wordTouch, readDir=readDir}
     talkButton.transIn = {}
     talkButton.transOut = {}
     if backgroundRectAlpha > 0 then
-        local backgroundRect = display.newRoundedRect(params.x, params.y, textGroup.width + padding*2 + leftPadding, textGroup.height + padding*2, 12)
+        local backgroundRect = display.newRoundedRect(params.x, params.y, txtDisplayGroup.width + padding*2 + talkButtonPadding, txtDisplayGroup.height + padding*2, 12)
         backgroundRect:setFillColor(backgroundRectColor[1],backgroundRectColor[2],backgroundRectColor[3])
         backgroundRect.alpha = backgroundRectAlpha
-        textGroup:insert(1,backgroundRect)
+        txtDisplayGroup:insert(1,backgroundRect)
     end
     if buttonInclude then
-        textGroup:insert(talkButton,true)
+        txtDisplayGroup:insert(talkButton,true)
         talkButton:setReferencePoint(display.CenterLeftReferencePoint)
         talkButton.x, talkButton.y = params.x+10,params.y+backgroundRect.height/2
     end
 
-    textGroup.alpha = 0
-    transition.to( textGroup, { time=transTime, alpha=1 } )
-    return talkButton, textGroup
+    txtDisplayGroup.alpha = 0
+    transition.to( txtDisplayGroup, { time=transTime, alpha=1 } )
+    return talkButton, txtDisplayGroup
 end
