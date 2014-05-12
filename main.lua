@@ -40,7 +40,8 @@ local syncSound = require( "syncSound" )
 ---------------------------------------------------------------------------------
 local bg
 local testText
-local testAudio = audio.loadStream( "audio.mp3" )
+local testAudio = audio.loadStream( "audio/audio.mp3" )
+local data = {}
 
 -- plain white background to put the text against
 bg = display.newRect( 0, 0, 1200, 800 )
@@ -61,4 +62,21 @@ testText = {
     {start = 3.809315, out = 4.812421, dur = 0, name = "syncSound."}
 }
 
-syncSound.AddSentence{ words=testText, audio=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 }
+--syncSound.AddSentence{ words=testText, audio=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 }
+
+local file = io.open( "audio/audio.txt", "r" )
+
+local i = 1
+for line in file:lines() do
+    --print( line )
+    data[i] = {}
+    --local temp, temp2, temp3 = string.match( line, '(%S+)%s*(%S+)%s*(%S+)' )
+    --print( temp, temp2 )
+    data[i].start, data[i].out, data[i].name = string.match( line, '(%S+)%s*(%S+)%s*(%S+)' )
+    -- data[i].start = start
+    -- data[i].out = out
+    -- data[i].name = name
+    print( data[i].name )
+    i = i + 1
+end
+--print( data[1].name )
