@@ -17,6 +17,11 @@
 local M = {} -- init module table
 
 
+function SayWord( event )
+    print( event.target.name .. " was tapped" )
+end
+
+
 function M.SaySentence( params )
     print( "step 3 - play the audio and highlight the text" )
     if ( params.narration ) then
@@ -113,9 +118,10 @@ local function DisplayText( params ) -- private function that uses the words loa
 
 		if ( canTapWords ) then
 			name = string.lower( string.gsub( words[i].name, "['.,]", "" ) )
-			wordsTable[i].wordAudio = audio.loadSound( wordAudioDir .. name .. ".mp3" )
+			--wordsTable[i].wordAudio = audio.loadSound( wordAudioDir .. name .. ".mp3" )
 			wordsTable[i].id = i
-			wordsTable[i].durration = audio.getDuration( wordsTable[i].wordAudio ) -- length the word takes to play
+            wordsTable[i].name = name
+			--wordsTable[i].durration = audio.getDuration( wordsTable[i].wordAudio ) -- length the word takes to play
 			wordsTable[i]:addEventListener( "tap", SayWord )
 		end -- end if canTapWords
 

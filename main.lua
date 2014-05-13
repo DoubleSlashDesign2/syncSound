@@ -52,6 +52,6 @@ bg.y = display.contentCenterY
 bg:setFillColor( .8, .8, .8 )
 
 -- test text for testing the add sentance function
-local wordsObject, textDisplayGroup = syncSound.AddSentence( { audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
+local wordsObject, textDisplayGroup = syncSound.AddSentence( { audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0, canTapWords=true } )
 --local wordsObject, textDisplayGroup = syncSound.AddSentence( { words=testText, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
 syncSound.SaySentence( { narration=true, wordsObject=wordsObject } )
