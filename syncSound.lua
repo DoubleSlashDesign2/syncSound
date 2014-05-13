@@ -17,6 +17,47 @@
 local M = {} -- init module table
 
 
+function M.SaySentence( params )
+    print( "step 3 - play the audio and highlight the text" )
+    if ( params.narration ) then
+        local wordsObject = params.wordsObject
+        local textTable = wordsObject.displayTextTable
+        local audioFile = wordsObject.audioFile
+        local words = wordsObject.words
+        local delayNarration = params.delayNarration or 500
+        local delayStart
+        local delayOut
+        local fadeDuration = params.fadeDuration or 100
+        local channel = params.channel or 16
+        local volume = params.volume or 1
+
+        if ( audio.isChannelPlaying( channel ) == false ) then
+            local timerClosure = function()
+                audio.rewind( audioFile )
+                audio.setVolume( volume )
+                audio.play( audioFile )
+
+                if ( wordsObject.talkButton ~= nil) then -- if a talk icon is being included with the text
+                    transition.to( wordsObject.talkButton, { time=fadeDuration, alpha=0.7 } )
+                    transition.to( wordsObject.talkButton, { time=fadeDuration, delay=words.soundLength + fadeDuration, alpha=1 } )
+                end
+
+                for i=1,#words do
+                    
+                    delayStart = (words[i].start * 1000) - fadeDuration
+                    if delayStart < 0 then delayStart = 0 end
+                    delayOut = (words[i].out * 1000) + fadeDuration
+
+                    transition.to( textTable[i].activeText, { delay = delayStart, alpha=1, time=fadeDuration } )
+                    transition.to( textTable[i].activeText, { delay = delayOut, alpha=0, time=fadeDuration } )
+
+                end -- end for i=1,#words
+            end -- end timerClosure
+            saySentenceTimer = timer.performWithDelay( delayNarration, timerClosure )
+        end -- end if ( audio.isChannelPlaying( channel ) == false )
+    end -- end if ( params.narration )
+end -- end function M.saySentence
+
 local function DisplayText( params ) -- private function that uses the words loaded in M.addSentence to create a display object for each word
 	print( "step 2 - create word display objects" )
 
@@ -42,21 +83,26 @@ local function DisplayText( params ) -- private function that uses the words loa
 		
 		print( words[i].name )
 		wordsTable[i] = display.newText( {text=words[i].name, font=font, fontSize=fontSize} ) -- create text display object
-		wordsTable[i]:setFillColor( fontColor )
+        print( fontColor[1], fontColor[2], fontColor[3] )
+		wordsTable[i]:setFillColor( fontColor[1], fontColor[2], fontColor[3] )
 		wordsTable[i].alpha = 1
 		wordsTable[i].activeText = display.newText( { text=words[i].name, font=font, fontSize=fontSize } ) -- create highlighted text display object
-		wordsTable[i].activeText:setFillColor( fontColorHi )
+		wordsTable[i].activeText:setFillColor( fontColorHi[1], fontColorHi[2], fontColorHi[3] )
 		wordsTable[i].activeText.alpha = 0 -- hide the highlighted text object
 		group:insert( wordsTable[i] ) -- insert into display group
 		group:insert( wordsTable[i].activeText ) -- insert into display group
 
 		if readDir == "leftToRight" then
 			wordsTable[i].anchorX = 0
+            wordsTable[i].activeText.anchorX = 0
 			wordsTable[i].anchorY = 0
+            wordsTable[i].activeText.anchorY = 0
 			newX = x+xOffset -- offset to the left
 		else -- rightToLeft reading direction
 			wordsTable[i].anchorX = 1
+            wordsTable[i].activeText.anchorX = 1
 			wordsTable[i].anchorY = 0
+            wordsTable[i].activeText.anchorY = 0
 			newX = x-xOffset -- offset to the right
 		end -- end if statement
 
@@ -104,7 +150,11 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     local delay = params.delay or 0 -- delay befor the narration starts playing and text is highlighted (value in milliseconds)
     local volume = params.volume or 1 -- volume level for the narration audio (values between 0 and 1)
     local font = params.font or native.systemFont -- text font
-    local fontColor = params.fontColor or { 0, 0, 0 } -- font color for text(default is black)
+    local fontColor = params.fontColor or {0, 0, 0} -- font color for text(default is black)
+    -- fontColor = { 1, 1, 1 }
+    -- if params.fontColor then
+    --     fontColor = params.fontColor
+    -- end
     local fontColorHi = params.fontColorHi or { 0, 0, 1 } -- font color for highlighted text (default is blue)
     local fontSize = params.fontSize or 24 -- font size for text
     local padding = params.padding or 20 -- padding between words and edge of screen
@@ -125,7 +175,7 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     	talkButtonPadding = 0 -- no talkButton
     end
 
-    dataObject.audio = params.audioFile -- file for the audio of the narration
+    dataObject.audioFile = params.audioFile -- file for the audio of the narration
     dataObject.audioDir = params.audioDir -- directory of the audio file
 
     local audacityFile = params.audacityFile or false -- let the user directly import an audacity label text file
@@ -153,7 +203,7 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     dataObject.displayTextTable = DisplayText(
 	    {
 	    	words=dataObject.words,
-	    	audio=dataObject.audio,
+	    	audioFile=dataObject.audioFile,
 	    	audioDir=dataObject.audioDir,
 	    	x=params.x+padding+talkButtonPadding,
 	    	y=params.y+padding+lineOffset,
@@ -169,7 +219,7 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     -- create the background rectangle behind the text
     if ( background ) then
     	local backgroundRect = display.newRoundedRect( params.x, params.y, txtDisplayGroup.width + (padding * 2) + talkButtonPadding, txtDisplayGroup.height + (padding * 2), 12 )
-    	backgroundRect:setFillColor( backgroundColor )
+    	backgroundRect:setFillColor( backgroundColor[1], backgroundColor[2], backgroundColor[3] )
     	backgroundRect.alpha = backgroundAlpha
     	txtDisplayGroup:insert( 1, backgroundRect )
     end

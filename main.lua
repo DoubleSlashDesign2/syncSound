@@ -41,26 +41,17 @@ local syncSound = require( "syncSound" )
 local bg
 local testText
 local testAudio = audio.loadStream( "audio/audio.mp3" )
+local testFile = "audio/audio.txt"
+local nothing = {.5, .5, .5}
+local color = nothing or {1, 1, 1}
 
 -- plain white background to put the text against
 bg = display.newRect( 0, 0, 1200, 800 )
 bg.x = display.contentCenterX
 bg.y = display.contentCenterY
-bg:setFillColor( 0.7, 0.7, 0.7 )
+bg:setFillColor( .8, .8, .8 )
 
 -- test text for testing the add sentance function
-testText = {
-    {start = 0.277719, out = 0.474610, dur = 0, name = "This"},
-    {start = 0.474610, out = 0.721241, dur = 0, name = "is"},
-    {start = 0.721241, out = 1.063209, dur = 0, name = "test"},
-    {start = 1.063209, out = 1.587560, dur = 0, name = "audio"},
-    {start = 1.587560, out = 1.867352, dur = 0, name = "for"},
-    {start = 1.867352, out = 2.447661, dur = 0, name = "Corona"},
-    {start = 2.447661, out = 3.146105, dur = 0, name = "SDK"},
-    {start = 3.146105, out = 3.809315, dur = 0, name = "module"},
-    {start = 3.809315, out = 4.812421, dur = 0, name = "syncSound."}
-}
-
-testFile = "audio/audio.txt"
-
-syncSound.AddSentence( { audacityFile=true, words=testFile, audio=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
+local wordsObject, textDisplayGroup = syncSound.AddSentence( { audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
+--local wordsObject, textDisplayGroup = syncSound.AddSentence( { words=testText, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
+syncSound.SaySentence( { narration=true, wordsObject=wordsObject } )
