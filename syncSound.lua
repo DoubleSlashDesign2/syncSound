@@ -126,8 +126,28 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     end
 
     dataObject.audio = params.audioFile -- file for the audio of the narration
-    dataObject.words = params.words -- list of words and word timings
     dataObject.audioDir = params.audioDir -- directory of the audio file
+
+    local audacityFile = params.audacityFile or false -- let the user directly import an audacity label text file
+    
+    if ( audacityFile ) then -- if using an audacity label text file
+    	print( "Audacity File Extraction:" )
+    
+    	local file = params.words -- audacity labels text file
+    	local data = io.open( file, "r" ) -- open the file
+    	dataObject.words = {} -- table to store the words and timings rows
+	
+		local i = 1
+		for line in data:lines() do
+		    dataObject.words[i] = {} -- table to store the words and timeings
+		    dataObject.words[i].start, dataObject.words[i].out, dataObject.words[i].name = string.match( line, '(%S+)%s*(%S+)%s*(%S+)' ) -- extract the start/stop/word
+		    print( dataObject.words[i].name )
+		    i = i + 1 -- go to next line
+		end -- end for line in data:lines()
+    
+    else -- not using an audacity label text file
+    	dataObject.words = params.words -- list of words and word timings
+    end -- end if audacityFile
 
     -- display the text and add the display group of text to the dataObject to be returned
     dataObject.displayTextTable = DisplayText(
