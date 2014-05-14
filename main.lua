@@ -40,10 +40,8 @@ local syncSound = require( "syncSound" )
 ---------------------------------------------------------------------------------
 local bg
 local testText
-local testAudio = audio.loadStream( "audio/audio.mp3" )
-local testFile = "audio/audio.txt"
-local nothing = {.5, .5, .5}
-local color = nothing or {1, 1, 1}
+local testAudio = audio.loadStream( "audio/fullAudio.mp3" )
+local testFile = "audio/fullAudio.txt"
 
 -- plain white background to put the text against
 bg = display.newRect( 0, 0, 1200, 800 )
@@ -51,7 +49,7 @@ bg.x = display.contentCenterX
 bg.y = display.contentCenterY
 bg:setFillColor( .8, .8, .8 )
 
--- test text for testing the add sentance function
-local wordsObject, textDisplayGroup = syncSound.AddSentence( { audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
---local wordsObject, textDisplayGroup = syncSound.AddSentence( { words=testText, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0 } )
+-- add the test text
+local wordsObject, textDisplayGroup = syncSound.AddSentence( { audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0, canTapWords=true } )
+-- play the test narration
 syncSound.SaySentence( { narration=true, wordsObject=wordsObject } )

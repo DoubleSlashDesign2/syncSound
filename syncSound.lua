@@ -12,9 +12,27 @@
 ---------------------------------------------------------------------------------
 -- Change log
 ---------------------------------------------------------------------------------
--- version 4.0 - (5/11/14) - Rewrite Electric Eggplant's original code to current Corona SDK and LUA module implimentation standards
+-- version 4.0 - (5/14/14)  Rewrite Electric Eggplant's original code to current Corona SDK and LUA module implimentation standards.
+--                          Added the ability to import audio and audio text files directly from audacity export files (no more hardcoding in the text).
 
 local M = {} -- init module table
+
+
+local function SayWord( event ) -- private function added as the listener function to each word if canTapWords is set to true
+    print( event.target.name .. " was tapped" )
+    local word = event.target
+
+    local dur = (word.durration) + 100 -- durration the highlight lasts on each word
+
+    if ( audio.isChannelPlaying( word.channel ) == false ) then -- if the audio channel is not already playing something
+        transition.to(word, { x=word.x-3, y=word.y-10, time=100, alpha=1, xScale=1.1, yScale=1.1 } ) -- increase the size and position of the word
+        transition.to(word.activeText, { x=word.activeText.x-3, y=word.activeText.y-10, time=100, alpha=1, xScale=1.1, yScale=1.1 } ) -- increase the size and position of the highlight word and turn on the highlight
+        transition.to(word.activeText, { x=word.activeText.x, y=word.activeText.y, delay=dur, alpha=0, time=100, xScale=1, yScale=1 } ) -- reset the highlight word
+        transition.to(word, { x=word.x, y=word.y, delay=dur, alpha=1, time=100, xScale=1, yScale=1  } ) -- reset the word
+        audio.setVolume( word.volume ) -- set volume
+        audio.play( word.wordAudio ) -- play the word's audio
+    end -- end if ( audio.isChannelPlaying( word.channel ) == false )
+end -- end SayWord function
 
 
 function M.SaySentence( params )
@@ -58,6 +76,7 @@ function M.SaySentence( params )
     end -- end if ( params.narration )
 end -- end function M.saySentence
 
+
 local function DisplayText( params ) -- private function that uses the words loaded in M.addSentence to create a display object for each word
 	print( "step 2 - create word display objects" )
 
@@ -83,8 +102,7 @@ local function DisplayText( params ) -- private function that uses the words loa
 		
 		print( words[i].name )
 		wordsTable[i] = display.newText( {text=words[i].name, font=font, fontSize=fontSize} ) -- create text display object
-        print( fontColor[1], fontColor[2], fontColor[3] )
-		wordsTable[i]:setFillColor( fontColor[1], fontColor[2], fontColor[3] )
+        wordsTable[i]:setFillColor( fontColor[1], fontColor[2], fontColor[3] )
 		wordsTable[i].alpha = 1
 		wordsTable[i].activeText = display.newText( { text=words[i].name, font=font, fontSize=fontSize } ) -- create highlighted text display object
 		wordsTable[i].activeText:setFillColor( fontColorHi[1], fontColorHi[2], fontColorHi[3] )
@@ -115,6 +133,9 @@ local function DisplayText( params ) -- private function that uses the words loa
 			name = string.lower( string.gsub( words[i].name, "['.,]", "" ) )
 			wordsTable[i].wordAudio = audio.loadSound( wordAudioDir .. name .. ".mp3" )
 			wordsTable[i].id = i
+            wordsTable[i].name = name
+            wordsTable[i].channel = params.channel
+            wordsTable[i].volume = params.volume
 			wordsTable[i].durration = audio.getDuration( wordsTable[i].wordAudio ) -- length the word takes to play
 			wordsTable[i]:addEventListener( "tap", SayWord )
 		end -- end if canTapWords
@@ -143,18 +164,10 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
 	local txtDisplayGroup = display.newGroup() -- display group for holding elements created in M.addSentence
     local fadeDuration = params.fadeDuration or 1000
     
-    -- TODO: Rethink how the talkButton is being used
-    -- Currently being used to also hold params table for other things
-    -- Change those var to be in some kind of actual params table and make the button optional for those who want a talking icon?
     local channel = params.channel or 16 -- channel to play the narration audio (channels between 1 and 32)
-    local delay = params.delay or 0 -- delay befor the narration starts playing and text is highlighted (value in milliseconds)
     local volume = params.volume or 1 -- volume level for the narration audio (values between 0 and 1)
     local font = params.font or native.systemFont -- text font
     local fontColor = params.fontColor or {0, 0, 0} -- font color for text(default is black)
-    -- fontColor = { 1, 1, 1 }
-    -- if params.fontColor then
-    --     fontColor = params.fontColor
-    -- end
     local fontColorHi = params.fontColorHi or { 0, 0, 1 } -- font color for highlighted text (default is blue)
     local fontSize = params.fontSize or 24 -- font size for text
     local padding = params.padding or 20 -- padding between words and edge of screen
@@ -213,6 +226,8 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
 	    	fontColorHi=fontColorHi,
 	    	group=txtDisplayGroup,
 	    	canTapWords=canTapWords,
+            channel=channel,
+            volume=volume,
 	    	readDir=readDir
 	    })
 
@@ -236,5 +251,6 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     return dataObject, txtDisplayGroup
 
 end -- end of M.AddSentence
+
 
 return M -- return module table
