@@ -84,10 +84,13 @@ If __audacityFile__ is true, __words__ is the name of the labels text file (incl
 If __audacityFile__ is false or not set, __words) is a table of tables that contains start times, stop times, and words to be used as the text. Start and stop times are in seconds. The table format must be as follows:
 
 `
-{
-    {start =  0.5805, out = 0.2786, name = "Here"},
-    {start =  0.3018, out = 0.3889, name = "is"},
-}
+text = {
+
+        {start =  0.5805, out = 0.2786, name = "Here"},
+    
+        {start =  0.3018, out = 0.3889, name = "is"},
+
+    }
 `
 
 __fadeDuration__ (optional)
@@ -212,10 +215,13 @@ Note: The included example uses the Audacity file import method. If you are tryi
 Text tables must be in the format:
 
 `
-{
-    {start =  0.5805, out = 0.2786, name = "Here"},
-    {start =  0.3018, out = 0.3889, name = "is"},
-}
+text = {
+
+        {start =  0.5805, out = 0.2786, name = "Here"},
+    
+        {start =  0.3018, out = 0.3889, name = "is"},
+
+    }
 `
 
 with each word of text being its own table. The tags for each value are required.
