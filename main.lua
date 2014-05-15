@@ -43,6 +43,19 @@ local testText
 local testAudio = audio.loadStream( "audio/fullAudio.mp3" )
 local testFile = "audio/fullAudio.txt"
 
+-- example text table if not using the Audacity File import method
+testText = {
+    {start = 0.277719, out = 0.474610, dur = 0, name = "This"},
+    {start = 0.474610, out = 0.721241, dur = 0, name = "is"},
+    {start = 0.721241, out = 1.063209, dur = 0, name = "test"},
+    {start = 1.063209, out = 1.587560, dur = 0, name = "audio"},
+    {start = 1.587560, out = 1.867352, dur = 0, name = "for"},
+    {start = 1.867352, out = 2.447661, dur = 0, name = "Corona"},
+    {start = 2.447661, out = 3.146105, dur = 0, name = "SDK"},
+    {start = 3.146105, out = 3.809315, dur = 0, name = "module"},
+    {start = 3.809315, out = 4.812421, dur = 0, name = "syncSound."}
+}
+
 -- plain white background to put the text against
 bg = display.newRect( 0, 0, 1200, 800 )
 bg.x = display.contentCenterX
