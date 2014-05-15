@@ -50,6 +50,6 @@ bg.y = display.contentCenterY
 bg:setFillColor( .8, .8, .8 )
 
 -- add the test text
-local wordsObject, textDisplayGroup = syncSound.AddSentence( { audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=0, y=0, canTapWords=true } )
+local wordsObject, textDisplayGroup = syncSound.AddSentence( { background=true, backgroundAlpha=1, audacityFile=true, words=testFile, audioFile=testAudio, audioDir = "audio", fadeDuration=500, x=50, y=200, canTapWords=true } )
 -- play the test narration
 syncSound.SaySentence( { narration=true, wordsObject=wordsObject } )

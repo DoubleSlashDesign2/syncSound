@@ -18,6 +18,10 @@
 local M = {} -- init module table
 
 
+local function onTapSentence( event )
+    -- body
+end
+
 local function SayWord( event ) -- private function added as the listener function to each word if canTapWords is set to true
     print( event.target.name .. " was tapped" )
     local word = event.target
@@ -30,7 +34,7 @@ local function SayWord( event ) -- private function added as the listener functi
         transition.to(word.activeText, { x=word.activeText.x, y=word.activeText.y, delay=dur, alpha=0, time=100, xScale=1, yScale=1 } ) -- reset the highlight word
         transition.to(word, { x=word.x, y=word.y, delay=dur, alpha=1, time=100, xScale=1, yScale=1  } ) -- reset the word
         audio.setVolume( word.volume ) -- set volume
-        audio.play( word.wordAudio ) -- play the word's audio
+        audio.play( word.wordAudio, { channel=word.channel } ) -- play the word's audio
     end -- end if ( audio.isChannelPlaying( word.channel ) == false )
 end -- end SayWord function
 
@@ -53,7 +57,7 @@ function M.SaySentence( params )
             local timerClosure = function()
                 audio.rewind( audioFile )
                 audio.setVolume( volume )
-                audio.play( audioFile )
+                audio.play( audioFile, { channel=channel } )
 
                 if ( wordsObject.talkButton ~= nil) then -- if a talk icon is being included with the text
                     transition.to( wordsObject.talkButton, { time=fadeDuration, alpha=0.7 } )
@@ -180,13 +184,16 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     local includeTalkButton = params.includeTalkButton or false     -- include the talk button icon adjacent to the text
     local talkButton = params.talkButton or nil -- icon to indicate that narration audio is playing
 
-    local talkButtonPadding -- padding to include the talkButton icon (if needed)
-    if ( includeTalkButton ) then
-    	talkButtonPadding = talkButton.width
-    	talkButton:addEventListener( "tap", onTapSentence )
-    else
-    	talkButtonPadding = 0 -- no talkButton
-    end
+    local talkButtonPadding = 0 -- padding to include the talkButton icon (if needed)
+
+    -- Code for upcoming addition of talk button
+    -- if ( includeTalkButton ) then
+    -- 	talkButtonPadding = talkButton.width
+    --     print( talkButton.width )
+    -- 	talkButton:addEventListener( "tap", onTapSentence )
+    -- else
+    -- 	talkButtonPadding = 0 -- no talkButton
+    -- end
 
     dataObject.audioFile = params.audioFile -- file for the audio of the narration
     dataObject.audioDir = params.audioDir -- directory of the audio file
@@ -235,6 +242,8 @@ function M.AddSentence( params ) -- public function for adding the audio and tex
     if ( background ) then
     	local backgroundRect = display.newRoundedRect( params.x, params.y, txtDisplayGroup.width + (padding * 2) + talkButtonPadding, txtDisplayGroup.height + (padding * 2), 12 )
     	backgroundRect:setFillColor( backgroundColor[1], backgroundColor[2], backgroundColor[3] )
+        backgroundRect.anchorX = dataObject.displayTextTable[1].anchorX
+        backgroundRect.anchorY = dataObject.displayTextTable[1].anchorY
     	backgroundRect.alpha = backgroundAlpha
     	txtDisplayGroup:insert( 1, backgroundRect )
     end
