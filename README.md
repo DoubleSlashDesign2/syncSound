@@ -83,15 +83,12 @@ If __audacityFile__ is true, __words__ is the name of the labels text file (incl
 
 If __audacityFile__ is false or not set, __words) is a table of tables that contains start times, stop times, and words to be used as the text. Start and stop times are in seconds. The table format must be as follows:
 
-`
-text = {
+    text = {
 
-        {start =  0.5805, out = 0.2786, name = "Here"},
-    
+        {start =  0.5805, out = 0.2786, name = "Here"},    
         {start =  0.3018, out = 0.3889, name = "is"},
 
     }
-`
 
 __fadeDuration__ (optional)
 
@@ -214,14 +211,11 @@ Example code as been included in the main.lua file of this repo.
 Note: The included example uses the Audacity file import method. If you are trying to hardcode in word table values and are having trouble with the format, please look at the Audacity labels text file named "fullAudio.txt" located in the audio folder.
 Text tables must be in the format:
 
-`
-text = {
+    text = {
 
-        {start =  0.5805, out = 0.2786, name = "Here"},
-    
+        {start =  0.5805, out = 0.2786, name = "Here"},    
         {start =  0.3018, out = 0.3889, name = "is"},
 
     }
-`
 
 with each word of text being its own table. The tags for each value are required.
