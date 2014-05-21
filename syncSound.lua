@@ -66,13 +66,16 @@ function M.SaySentence( params )
 
                 for i=1,#words do
                     
-                    delayStart = (words[i].start * 1000) - fadeDuration
-                    if delayStart < 0 then delayStart = 0 end
-                    delayOut = (words[i].out * 1000) + fadeDuration
+                    if (words[i].name ~= "/n" ) then
+                        
+                        delayStart = (words[i].start * 1000) - fadeDuration
+                        if delayStart < 0 then delayStart = 0 end
+                        delayOut = (words[i].out * 1000) + fadeDuration
 
-                    transition.to( textTable[i].activeText, { delay = delayStart, alpha=1, time=fadeDuration } )
-                    transition.to( textTable[i].activeText, { delay = delayOut, alpha=0, time=fadeDuration } )
+                        transition.to( textTable[i].activeText, { delay = delayStart, alpha=1, time=fadeDuration } )
+                        transition.to( textTable[i].activeText, { delay = delayOut, alpha=0, time=fadeDuration } )
 
+                    end
                 end -- end for i=1,#words
             end -- end timerClosure
             saySentenceTimer = timer.performWithDelay( delayNarration, timerClosure )
@@ -104,52 +107,58 @@ local function DisplayText( params ) -- private function that uses the words loa
 
 	for i=1,#words do
 		
-		print( words[i].name )
-		wordsTable[i] = display.newText( {text=words[i].name, font=font, fontSize=fontSize} ) -- create text display object
-        wordsTable[i]:setFillColor( fontColor[1], fontColor[2], fontColor[3] )
-		wordsTable[i].alpha = 1
-		wordsTable[i].activeText = display.newText( { text=words[i].name, font=font, fontSize=fontSize } ) -- create highlighted text display object
-		wordsTable[i].activeText:setFillColor( fontColorHi[1], fontColorHi[2], fontColorHi[3] )
-		wordsTable[i].activeText.alpha = 0 -- hide the highlighted text object
-		group:insert( wordsTable[i] ) -- insert into display group
-		group:insert( wordsTable[i].activeText ) -- insert into display group
+        if ( words[i].name ~= "/n" ) then
 
-		if readDir == "leftToRight" then
-			wordsTable[i].anchorX = 0
-            wordsTable[i].activeText.anchorX = 0
-			wordsTable[i].anchorY = 0
-            wordsTable[i].activeText.anchorY = 0
-			newX = x+xOffset -- offset to the left
-		else -- rightToLeft reading direction
-			wordsTable[i].anchorX = 1
-            wordsTable[i].activeText.anchorX = 1
-			wordsTable[i].anchorY = 0
-            wordsTable[i].activeText.anchorY = 0
-			newX = x-xOffset -- offset to the right
-		end -- end if statement
+    		print( words[i].name )
+    		wordsTable[i] = display.newText( {text=words[i].name, font=font, fontSize=fontSize} ) -- create text display object
+            wordsTable[i]:setFillColor( fontColor[1], fontColor[2], fontColor[3] )
+    		wordsTable[i].alpha = 1
+    		wordsTable[i].activeText = display.newText( { text=words[i].name, font=font, fontSize=fontSize } ) -- create highlighted text display object
+    		wordsTable[i].activeText:setFillColor( fontColorHi[1], fontColorHi[2], fontColorHi[3] )
+    		wordsTable[i].activeText.alpha = 0 -- hide the highlighted text object
+    		group:insert( wordsTable[i] ) -- insert into display group
+    		group:insert( wordsTable[i].activeText ) -- insert into display group
 
-		wordsTable[i].x = newX
-		wordsTable[i].y = y
-		wordsTable[i].activeText.x = newX
-		wordsTable[i].activeText.y = y
+    		if readDir == "leftToRight" then
+    			wordsTable[i].anchorX = 0
+                wordsTable[i].activeText.anchorX = 0
+    			wordsTable[i].anchorY = 0
+                wordsTable[i].activeText.anchorY = 0
+    			newX = x+xOffset -- offset to the left
+    		else -- rightToLeft reading direction
+    			wordsTable[i].anchorX = 1
+                wordsTable[i].activeText.anchorX = 1
+    			wordsTable[i].anchorY = 0
+                wordsTable[i].activeText.anchorY = 0
+    			newX = x-xOffset -- offset to the right
+    		end -- end if statement
 
-		if ( canTapWords ) then
-			name = string.lower( string.gsub( words[i].name, "['.,]", "" ) )
-			wordsTable[i].wordAudio = audio.loadSound( wordAudioDir .. name .. ".mp3" )
-			wordsTable[i].id = i
-            wordsTable[i].name = name
-            wordsTable[i].channel = params.channel
-            wordsTable[i].volume = params.volume
-			wordsTable[i].durration = audio.getDuration( wordsTable[i].wordAudio ) -- length the word takes to play
-			wordsTable[i]:addEventListener( "tap", SayWord )
-		end -- end if canTapWords
+    		wordsTable[i].x = newX
+    		wordsTable[i].y = y
+    		wordsTable[i].activeText.x = newX
+    		wordsTable[i].activeText.y = y
 
-		xOffset = xOffset + wordsTable[i].width + wordSpacing
+    		if ( canTapWords ) then
+    			name = string.lower( string.gsub( words[i].name, "['.,]", "" ) )
+                if (name ~= "/n") then
+        			wordsTable[i].wordAudio = audio.loadSound( wordAudioDir .. name .. ".mp3" )
+        			wordsTable[i].id = i
+                    wordsTable[i].name = name
+                    wordsTable[i].channel = params.channel
+                    wordsTable[i].volume = params.volume
+        			wordsTable[i].durration = audio.getDuration( wordsTable[i].wordAudio ) -- length the word takes to play
+        			wordsTable[i]:addEventListener( "tap", SayWord )
+                end
+    		end -- end if canTapWords
 
-		if ( words[i].newline ) then
-			y = y + lineSpacing
-			xOffset = 0
-		end -- end if words[i].newline
+    		xOffset = xOffset + wordsTable[i].width + wordSpacing
+
+        else
+
+            y = y + lineSpacing
+            xOffset = 0
+
+        end -- end if words[i].newline
 
 	end -- end for i=1,#words
 
